@@ -4,14 +4,6 @@
 #include <pico/stdlib.h>
 #include <hardware/spi.h>
 
-#define SPI_INSTANCE spi0
-#define PIN_SCLK     2
-#define PIN_MOSI     3
-#define PIN_MISO     4
-#define PIN_CS       5
-#define PIN_RST      6
-#define PIN_INT      7
-
 #define w5kiss_init_default_mac(frequency) { \
     uint8_t mac[6]; \
     w5kiss_get_default_mac(mac); \

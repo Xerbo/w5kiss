@@ -43,14 +43,14 @@ int main() {
     ip_addr_t address = IPADDR4_INIT_BYTES(192, 168, 1,   10);
     ip_addr_t gateway = IPADDR4_INIT_BYTES(192, 168, 1,   1);
     ip_addr_t netmask = IPADDR4_INIT_BYTES(255, 255, 255, 0);
-    netif_add(&netif, &address, &netmask, &gateway, NULL, &w5k_netif_init, &ethernet_input);
+    netif_add(&netif, &address, &netmask, &gateway, NULL, &w5kiss_netif_init, &ethernet_input);
     netif_set_default(&netif);
     netif_set_up(&netif);
 
     while (true) {
         // This will be improved and moved into w5kiss_netif soon
         uint8_t buffer[1600];
-        uint16_t len = w5k_receive(buffer, 1600);
+        uint16_t len = w5kiss_receive(buffer, 1600);
         if (len != 0) {
             struct pbuf *p = pbuf_alloc(PBUF_RAW, len, PBUF_RAM);
             pbuf_take(p, buffer, len);
