@@ -11,7 +11,7 @@ err_t w5kiss_netif_init(struct netif *netif) {
     netif->linkoutput = w5kiss_netif_output;
     netif->output     = etharp_output;
     netif->mtu        = 1500;
-    netif->flags      = NETIF_FLAG_BROADCAST | NETIF_FLAG_LINK_UP | NETIF_FLAG_ETHARP | NETIF_FLAG_ETHERNET;
+    netif->flags      = NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_ETHERNET;
     netif->name[0]    = 'w';
     netif->name[1]    = '5';
     netif->hostname   = "Pico";
@@ -23,6 +23,15 @@ err_t w5kiss_netif_init(struct netif *netif) {
 }
 
 void w5kiss_netif_input(struct netif *netif) {
+    bool connected = w5kiss_is_connected();
+    if (connected != netif_is_link_up(netif)) {
+        if (connected) {
+            netif_set_link_up(netif);
+        } else {
+            netif_set_link_down(netif);
+        }
+    }
+
     uint16_t len = w5kiss_peek_length();
     if (len != 0) {
         struct pbuf *p = pbuf_alloc(PBUF_RAW, len, PBUF_POOL);

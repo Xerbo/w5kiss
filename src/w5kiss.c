@@ -1,4 +1,5 @@
 #include "w5kiss.h"
+#include <string.h>
 #include <hardware/spi.h>
 #include <hardware/flash.h>
 #include <pico/binary_info.h>
@@ -69,7 +70,7 @@ void w5kiss_sw_reset() {
     sleep_ms(100);
 }
 
-void w5kiss_init(uint frequency, uint8_t *mac) {
+bool w5kiss_init(uint frequency, uint8_t *mac) {
     spi_init(SPI_INSTANCE, frequency);
     gpio_set_function(PIN_SCLK, GPIO_FUNC_SPI);
     gpio_set_function(PIN_MOSI, GPIO_FUNC_SPI);
@@ -101,12 +102,18 @@ void w5kiss_init(uint frequency, uint8_t *mac) {
 
     // Open socket
     w5kiss_write_byte(BSB_SOCKET0, SOCKET_CR, SCR_OPEN);
+
+    // Check communication was successful
+    uint8_t _mac[6];
+    w5kiss_read(BSB_COMMON, COMMON_SHAR, _mac, 6);
+    return memcmp(mac, _mac, 6) == 0;
 }
 
 void w5kiss_get_default_mac(uint8_t *mac) {
     uint8_t unique_id[8];
     flash_get_unique_id(unique_id);
 
+    // Raspberry Pi Trading Ltd
     mac[0] = 0xDC;
     mac[1] = 0xA6;
     mac[2] = 0x32;
@@ -169,4 +176,8 @@ bool w5kiss_send(uint8_t *data, uint16_t len) {
 
     // Just assume the packet was sent correctly (it probably was)
     return true;
+}
+
+bool w5kiss_is_connected() {
+    return w5kiss_read_byte(BSB_COMMON, COMMON_PHYCFGR) & PHYCFGR_LNK;
 }

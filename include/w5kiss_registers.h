@@ -11,8 +11,9 @@ enum {
 
 // Common registers
 enum {
-    COMMON_MR   = 0x0000, // Mode Register [R/W]
-    COMMON_SHAR = 0x0009, // Source Hardware Address Register [R/W]
+    COMMON_MR      = 0x0000, // Mode Register [R/W]
+    COMMON_SHAR    = 0x0009, // Source Hardware Address Register [R/W]
+    COMMON_PHYCFGR = 0x002E, // W5500 PHY Configuration Register [R/W]
 };
 
 // Socket registers
@@ -34,6 +35,13 @@ enum {
     MR_PB    = 1 << 4, // Ping Block Mode
     MR_PPPOE = 1 << 3, // PPPoE Mode
     MR_FARP  = 1 << 1, // Force ARP
+};
+
+// PHY config register values
+enum {
+    PHYCFGR_DPX  = 1 << 2, // Duplex Status
+    PHYCFGR_SPD  = 1 << 1, // Speed Status
+    PHYCFGR_LNK  = 1 << 0, // Link Status
 };
 
 // Socket mode register values
