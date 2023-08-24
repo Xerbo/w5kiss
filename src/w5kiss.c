@@ -122,14 +122,12 @@ void w5kiss_get_current_mac(uint8_t *mac) {
 void _w5kiss_ignore(size_t len) {
     uint16_t ptr = w5kiss_read_word_safe(BSB_SOCKET0, SOCKET_RX_RD);
     w5kiss_write_word(BSB_SOCKET0, SOCKET_RX_RD, ptr + len);
-    w5kiss_write_byte(BSB_SOCKET0, SOCKET_CR, SCR_RECV);
 }
 
 void _w5kiss_receive(uint8_t *data, uint16_t len) {
     uint16_t ptr = w5kiss_read_word_safe(BSB_SOCKET0, SOCKET_RX_RD);
     w5kiss_read(BSB_SOCKET0_RX, ptr, data, len);
     w5kiss_write_word(BSB_SOCKET0, SOCKET_RX_RD, ptr + len);
-    w5kiss_write_byte(BSB_SOCKET0, SOCKET_CR, SCR_RECV);
 }
 
 uint16_t w5kiss_receive(uint8_t *data, uint16_t max_len) {
@@ -138,15 +136,27 @@ uint16_t w5kiss_receive(uint8_t *data, uint16_t max_len) {
 
     uint8_t header[2];
     _w5kiss_receive(header, 2);
+    w5kiss_write_byte(BSB_SOCKET0, SOCKET_CR, SCR_RECV);
     uint16_t len = (header[0] << 8 | header[1]) - 2;
 
     if (len > max_len) {
         _w5kiss_ignore(len);
+        w5kiss_write_byte(BSB_SOCKET0, SOCKET_CR, SCR_RECV);
         return 0;
     } else {
         _w5kiss_receive(data, len);
+        w5kiss_write_byte(BSB_SOCKET0, SOCKET_CR, SCR_RECV);
         return len;
     }
+}
+
+uint16_t w5kiss_peek_length() {
+    // Ensure there is actually data
+    if (w5kiss_read_word_safe(BSB_SOCKET0, SOCKET_RX_RSR) == 0) return 0;
+
+    uint8_t header[2];
+    _w5kiss_receive(header, 2);
+    return (header[0] << 8 | header[1]) - 2;
 }
 
 bool w5kiss_send(uint8_t *data, uint16_t len) {

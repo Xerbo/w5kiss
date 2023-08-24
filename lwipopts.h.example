@@ -1,7 +1,7 @@
 // Adapted from https://github.com/raspberrypi/pico-examples/blob/master/pico_w/wifi/lwipopts_examples_common.h
 
-#ifndef _LWIPOPTS_DEFAULT_H
-#define _LWIPOPTS_DEFAULT_H
+#ifndef _LWIPOPTS_H
+#define _LWIPOPTS_H
 
 #define NO_SYS                      1
 #define LWIP_SOCKET                 0

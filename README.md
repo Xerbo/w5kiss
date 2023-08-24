@@ -24,9 +24,9 @@ target_link_libraries(${PROJECT_NAME} ... w5kiss)
 w5kiss uses the internal LwIP stack that comes with pico-sdk so adding apps can be done by linking `pico_lwip_xxxx`.
 
 ```c
-#include <stdio.h>
 #include <pico/stdlib.h>
 #include <lwip/init.h>
+#include <lwip/dhcp.h>
 #include <lwip/timeouts.h>
 #include <netif/ethernet.h>
 
@@ -36,29 +36,17 @@ w5kiss uses the internal LwIP stack that comes with pico-sdk so adding apps can 
 int main() {
     stdio_init_all();
 
-    w5k_init_default_mac(20000000);
+    w5kiss_init_default_mac(5000000);
     lwip_init();
 
     struct netif netif;
-    ip_addr_t address = IPADDR4_INIT_BYTES(192, 168, 1,   10);
-    ip_addr_t gateway = IPADDR4_INIT_BYTES(192, 168, 1,   1);
-    ip_addr_t netmask = IPADDR4_INIT_BYTES(255, 255, 255, 0);
-    netif_add(&netif, &address, &netmask, &gateway, NULL, &w5kiss_netif_init, &ethernet_input);
+    netif_add(&netif, NULL, NULL, NULL, NULL, &w5kiss_netif_init, &ethernet_input);
     netif_set_default(&netif);
     netif_set_up(&netif);
+    dhcp_start(&netif);
 
     while (true) {
-        // This will be improved and moved into w5kiss_netif soon
-        uint8_t buffer[1600];
-        uint16_t len = w5kiss_receive(buffer, 1600);
-        if (len != 0) {
-            struct pbuf *p = pbuf_alloc(PBUF_RAW, len, PBUF_RAM);
-            pbuf_take(p, buffer, len);
-            if (netif.input(p, &netif) != ERR_OK) {
-                pbuf_free(p);
-            }
-        }
-
+        w5kiss_netif_input(&netif);
         sys_check_timeouts();
     }
 }

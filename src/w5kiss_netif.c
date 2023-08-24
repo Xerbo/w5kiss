@@ -14,8 +14,21 @@ err_t w5kiss_netif_init(struct netif *netif) {
     netif->flags      = NETIF_FLAG_BROADCAST | NETIF_FLAG_LINK_UP | NETIF_FLAG_ETHARP | NETIF_FLAG_ETHERNET;
     netif->name[0]    = 'w';
     netif->name[1]    = '5';
+    netif->hostname   = "Pico";
+
     w5kiss_get_current_mac(netif->hwaddr);
     netif->hwaddr_len = 6;
 
     return ERR_OK;
+}
+
+void w5kiss_netif_input(struct netif *netif) {
+    uint16_t len = w5kiss_peek_length();
+    if (len != 0) {
+        struct pbuf *p = pbuf_alloc(PBUF_RAW, len, PBUF_POOL);
+        w5kiss_receive(p->payload, p->tot_len);
+        if (netif->input(p, netif) != ERR_OK) {
+            pbuf_free(p);
+        }
+    }
 }

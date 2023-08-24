@@ -16,5 +16,6 @@ void w5kiss_get_current_mac(uint8_t *mac);
 
 bool w5kiss_send(uint8_t *data, uint16_t len);
 uint16_t w5kiss_receive(uint8_t *data, uint16_t max_len);
+uint16_t w5kiss_peek_length();
 
 #endif
