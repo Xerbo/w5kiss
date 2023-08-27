@@ -3,6 +3,7 @@
 #include <hardware/spi.h>
 #include <hardware/flash.h>
 #include <pico/binary_info.h>
+#include <pico/unique_id.h>
 #include "w5kiss_registers.h"
 
 // Default to W5500-EVB-Pico pinout
@@ -110,16 +111,16 @@ bool w5kiss_init(uint frequency, uint8_t *mac) {
 }
 
 void w5kiss_get_default_mac(uint8_t *mac) {
-    uint8_t unique_id[8];
-    flash_get_unique_id(unique_id);
+    pico_unique_board_id_t unique_id;
+    pico_get_unique_board_id(&unique_id);
 
     // Raspberry Pi Trading Ltd
     mac[0] = 0xDC;
     mac[1] = 0xA6;
     mac[2] = 0x32;
-    mac[3] = unique_id[0];
-    mac[4] = unique_id[1];
-    mac[5] = unique_id[2];
+    mac[3] = unique_id.id[0];
+    mac[4] = unique_id.id[1];
+    mac[5] = unique_id.id[2];
 }
 
 void w5kiss_get_current_mac(uint8_t *mac) {

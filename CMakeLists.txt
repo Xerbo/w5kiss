@@ -16,5 +16,6 @@ target_include_directories(w5kiss INTERFACE
 target_link_libraries(w5kiss INTERFACE
     pico_lwip
     pico_rand
+    pico_unique_id
     hardware_spi
 )
