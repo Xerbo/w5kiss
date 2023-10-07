@@ -41,8 +41,13 @@ uint16_t w5kiss_read_word(uint8_t block, uint16_t address) {
     return w5kiss_read_byte(block, address) << 8 | w5kiss_read_byte(block, address+1);
 }
 uint16_t w5kiss_read_word_safe(uint8_t block, uint16_t address) {
-    // FIXME: implement this
-    return w5kiss_read_word(block, address);
+    while (true) {
+        uint16_t a = w5kiss_read_word(block, address);
+        uint16_t b = w5kiss_read_word(block, address);
+        if (a == b) {
+            return a;
+        }
+    }
 }
 
 void w5kiss_write(uint8_t block, uint16_t address, const uint8_t *data, size_t len) {
